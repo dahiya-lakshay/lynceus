@@ -24,6 +24,7 @@ from app.database.base import Base
 
 if TYPE_CHECKING:
     from app.models.user import User
+    from app.models.prediction import Prediction
 
 
 class TransactionStatus(str, Enum):
@@ -125,4 +126,9 @@ class Transaction(Base):
         "User",
         foreign_keys=[receiver_id],
         back_populates="received_transactions",
+    )
+
+    predictions: Mapped[list["Prediction"]] = relationship(
+        "Prediction",
+        back_populates="transaction",
     )
