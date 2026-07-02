@@ -1,5 +1,4 @@
 import uuid as uuid_pkg
-
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
@@ -23,7 +22,6 @@ from sqlalchemy.orm import (
 from app.database.base import Base
 
 if TYPE_CHECKING:
-    from app.models.user import User
     from app.models.prediction import Prediction
 
 
@@ -114,18 +112,6 @@ class Transaction(Base):
         default=datetime.utcnow,
         onupdate=datetime.utcnow,
         nullable=False,
-    )
-
-    sender: Mapped["User"] = relationship(
-        "User",
-        foreign_keys=[sender_id],
-        back_populates="sent_transactions",
-    )
-
-    receiver: Mapped["User"] = relationship(
-        "User",
-        foreign_keys=[receiver_id],
-        back_populates="received_transactions",
     )
 
     predictions: Mapped[list["Prediction"]] = relationship(

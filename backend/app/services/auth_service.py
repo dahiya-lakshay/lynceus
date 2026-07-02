@@ -30,7 +30,7 @@ class AuthService:
             full_name=user_data.full_name,
             email=user_data.email,
             password_hash=hash_password(
-                user_data.password
+                user_data.password,
             ),
         )
 
@@ -51,7 +51,7 @@ class AuthService:
             email,
         )
 
-        if not user:
+        if user is None:
             raise ValueError("Invalid credentials")
 
         if not verify_password(
@@ -60,10 +60,8 @@ class AuthService:
         ):
             raise ValueError("Invalid credentials")
 
-        token = create_access_token(
+        return create_access_token(
             {
                 "sub": user.email,
             }
         )
-
-        return token

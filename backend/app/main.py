@@ -1,14 +1,8 @@
 from fastapi import FastAPI
 
-from app.config import settings
-
-# Import every model once so SQLAlchemy registers them
-import app.models.user
-import app.models.transaction
-import app.models.prediction
-
 from app.api.auth import router as auth_router
-
+from app.api.users import router as users_router
+from app.config import settings
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -16,6 +10,7 @@ app = FastAPI(
 )
 
 app.include_router(auth_router)
+app.include_router(users_router)
 
 
 @app.get("/")

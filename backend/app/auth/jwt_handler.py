@@ -49,4 +49,6 @@ def verify_access_token(
         return payload
 
     except JWTError as exc:
-        raise ValueError("Invalid or expired token") from exc
+        raise ValueError(
+            "Invalid or expired token"
+        ) from exc
