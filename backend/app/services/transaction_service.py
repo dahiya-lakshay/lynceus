@@ -9,6 +9,9 @@ from app.repositories.transaction_repository import (
     TransactionRepository,
 )
 from app.schemas.transaction import CreateTransaction
+from app.services.prediction_service import (
+    PredictionService,
+)
 
 
 class TransactionService:
@@ -29,10 +32,20 @@ class TransactionService:
             ),
         )
 
-        return TransactionRepository.create(
+        transaction = TransactionRepository.create(
             db,
             transaction,
         )
+
+        # Automatically generate fraud prediction
+        PredictionService.predict_transaction(
+            db,
+            transaction,
+        )
+
+        db.refresh(transaction)
+
+        return transaction
 
     @staticmethod
     def get_all_transactions(
