@@ -4,6 +4,8 @@ from pydantic import (
     EmailStr,
 )
 
+from app.models.user import UserRole
+
 
 class UserRegister(BaseModel):
     full_name: str
@@ -29,6 +31,7 @@ class UserResponse(BaseModel):
     id: int
     full_name: str
     email: EmailStr
+    role: UserRole
 
     model_config = ConfigDict(
         from_attributes=True,

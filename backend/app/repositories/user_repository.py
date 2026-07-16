@@ -28,6 +28,16 @@ class UserRepository:
         )
 
     @staticmethod
+    def get_all(
+        db: Session,
+    ) -> list[User]:
+        return (
+            db.query(User)
+            .order_by(User.created_at.desc())
+            .all()
+        )
+
+    @staticmethod
     def create(
         db: Session,
         user: User,
