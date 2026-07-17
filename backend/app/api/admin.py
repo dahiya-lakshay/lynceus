@@ -24,4 +24,18 @@ def get_all_users(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_admin),
 ):
-    return AdminService.get_all_users(db)
+    return AdminService.get_all_users(
+        db,
+    )
+
+
+@router.get(
+    "/dashboard",
+)
+def get_dashboard(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    return AdminService.get_dashboard_stats(
+        db,
+    )
