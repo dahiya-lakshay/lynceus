@@ -38,3 +38,23 @@ class TransactionRepository:
             .filter(Transaction.id == transaction_id)
             .first()
         )
+
+    @staticmethod
+    def update(
+        db: Session,
+        transaction: Transaction,
+    ) -> Transaction:
+
+        db.commit()
+        db.refresh(transaction)
+
+        return transaction
+
+    @staticmethod
+    def delete(
+        db: Session,
+        transaction: Transaction,
+    ) -> None:
+
+        db.delete(transaction)
+        db.commit()

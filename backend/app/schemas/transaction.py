@@ -19,6 +19,11 @@ class CreateTransaction(BaseModel):
     payment_method: PaymentMethod
 
 
+class UpdateTransaction(BaseModel):
+    amount: Decimal | None = None
+    payment_method: PaymentMethod | None = None
+
+
 class TransactionResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

@@ -2,6 +2,7 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
+    Response,
     status,
 )
 from sqlalchemy.orm import Session
@@ -12,6 +13,7 @@ from app.models.user import User
 from app.schemas.transaction import (
     CreateTransaction,
     TransactionResponse,
+    UpdateTransaction,
 )
 from app.services.transaction_service import (
     TransactionService,
@@ -75,3 +77,39 @@ def get_transaction(
         )
 
     return transaction
+
+
+@router.patch(
+    "/{transaction_id}",
+    response_model=TransactionResponse,
+)
+def update_transaction(
+    transaction_id: int,
+    transaction: UpdateTransaction,
+    db: Session = Depends(get_db),
+):
+
+    return TransactionService.update_transaction(
+        db,
+        transaction_id,
+        transaction,
+    )
+
+
+@router.delete(
+    "/{transaction_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_transaction(
+    transaction_id: int,
+    db: Session = Depends(get_db),
+):
+
+    TransactionService.delete_transaction(
+        db,
+        transaction_id,
+    )
+
+    return Response(
+        status_code=status.HTTP_204_NO_CONTENT,
+    )
