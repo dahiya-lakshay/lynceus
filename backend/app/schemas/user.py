@@ -1,6 +1,11 @@
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
+
+
+class UpdateUser(BaseModel):
+    full_name: str | None = None
+    email: EmailStr | None = None
 
 
 class UserProfile(BaseModel):
