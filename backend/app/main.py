@@ -5,6 +5,7 @@ import app.models
 
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
+from app.api.cases import router as cases_router
 from app.api.investigation import router as investigation_router
 from app.api.predictions import router as prediction_router
 from app.api.transactions import router as transaction_router
@@ -22,6 +23,7 @@ app.include_router(transaction_router)
 app.include_router(prediction_router)
 app.include_router(admin_router)
 app.include_router(investigation_router)
+app.include_router(cases_router)
 
 
 @app.get("/")
