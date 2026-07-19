@@ -74,19 +74,42 @@ class PredictionService:
     @staticmethod
     def get_predictions(
         db: Session,
+        page: int = 1,
+        size: int = 20,
         prediction_label: PredictionLabel | None = None,
         model_name: str | None = None,
         min_risk_score: float | None = None,
         max_risk_score: float | None = None,
+        sort_by: str = "created_at",
+        sort_order: str = "desc",
     ):
 
-        return PredictionRepository.get_all(
+        predictions = PredictionRepository.get_all(
+            db,
+            page,
+            size,
+            prediction_label,
+            model_name,
+            min_risk_score,
+            max_risk_score,
+            sort_by,
+            sort_order,
+        )
+
+        total = PredictionRepository.count(
             db,
             prediction_label,
             model_name,
             min_risk_score,
             max_risk_score,
         )
+
+        return {
+            "page": page,
+            "size": size,
+            "total": total,
+            "items": predictions,
+        }
 
     @staticmethod
     def get_prediction(

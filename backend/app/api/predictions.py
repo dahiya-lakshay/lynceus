@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 
 from app.database.database import get_db
 from app.models.prediction import PredictionLabel
+from app.schemas.common import PaginatedResponse
 from app.schemas.prediction import PredictionResponse
 from app.services.prediction_service import PredictionService
 
@@ -18,9 +19,11 @@ router = APIRouter(
 
 @router.get(
     "",
-    response_model=list[PredictionResponse],
+    response_model=PaginatedResponse[PredictionResponse],
 )
 def get_predictions(
+    page: int = Query(1, ge=1),
+    size: int = Query(20, ge=1, le=100),
     prediction_label: PredictionLabel | None = Query(
         default=None,
     ),
@@ -37,15 +40,34 @@ def get_predictions(
         ge=0,
         le=100,
     ),
+    sort_by: str = Query(
+        default="created_at",
+        pattern="^(id|risk_score|fraud_probability|created_at|prediction_label|model_name)$",
+    ),
+    sort_order: str = Query(
+        default="desc",
+        pattern="^(asc|desc)$",
+    ),
     db: Session = Depends(get_db),
 ):
 
-    return PredictionService.get_predictions(
+    result = PredictionService.get_predictions(
         db,
+        page,
+        size,
         prediction_label,
         model_name,
         min_risk_score,
         max_risk_score,
+        sort_by,
+        sort_order,
+    )
+
+    return PaginatedResponse[PredictionResponse].create(
+        page=result["page"],
+        size=result["size"],
+        total=result["total"],
+        items=result["items"],
     )
 
 
