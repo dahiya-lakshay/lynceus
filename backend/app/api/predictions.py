@@ -1,16 +1,14 @@
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
-    status,
+    Query,
 )
 from sqlalchemy.orm import Session
 
 from app.database.database import get_db
-from app.repositories.prediction_repository import (
-    PredictionRepository,
-)
+from app.models.prediction import PredictionLabel
 from app.schemas.prediction import PredictionResponse
+from app.services.prediction_service import PredictionService
 
 router = APIRouter(
     prefix="/predictions",
@@ -23,11 +21,31 @@ router = APIRouter(
     response_model=list[PredictionResponse],
 )
 def get_predictions(
+    prediction_label: PredictionLabel | None = Query(
+        default=None,
+    ),
+    model_name: str | None = Query(
+        default=None,
+    ),
+    min_risk_score: float | None = Query(
+        default=None,
+        ge=0,
+        le=100,
+    ),
+    max_risk_score: float | None = Query(
+        default=None,
+        ge=0,
+        le=100,
+    ),
     db: Session = Depends(get_db),
 ):
 
-    return PredictionRepository.get_all(
+    return PredictionService.get_predictions(
         db,
+        prediction_label,
+        model_name,
+        min_risk_score,
+        max_risk_score,
     )
 
 
@@ -40,18 +58,10 @@ def get_prediction(
     db: Session = Depends(get_db),
 ):
 
-    prediction = PredictionRepository.get_by_id(
+    return PredictionService.get_prediction(
         db,
         prediction_id,
     )
-
-    if prediction is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Prediction not found",
-        )
-
-    return prediction
 
 
 @router.get(
@@ -63,17 +73,7 @@ def get_prediction_by_transaction(
     db: Session = Depends(get_db),
 ):
 
-    prediction = (
-        PredictionRepository.get_by_transaction_id(
-            db,
-            transaction_id,
-        )
+    return PredictionService.get_prediction_by_transaction(
+        db,
+        transaction_id,
     )
-
-    if prediction is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Prediction not found",
-        )
-
-    return prediction

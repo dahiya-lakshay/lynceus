@@ -23,10 +23,38 @@ class PredictionRepository:
     @staticmethod
     def get_all(
         db: Session,
+        prediction_label: PredictionLabel | None = None,
+        model_name: str | None = None,
+        min_risk_score: float | None = None,
+        max_risk_score: float | None = None,
     ) -> list[Prediction]:
 
+        query = db.query(Prediction)
+
+        if prediction_label is not None:
+            query = query.filter(
+                Prediction.prediction_label == prediction_label
+            )
+
+        if model_name is not None:
+            query = query.filter(
+                Prediction.model_name == model_name
+            )
+
+        if min_risk_score is not None:
+            query = query.filter(
+                Prediction.risk_score >= min_risk_score
+            )
+
+        if max_risk_score is not None:
+            query = query.filter(
+                Prediction.risk_score <= max_risk_score
+            )
+
         return (
-            db.query(Prediction)
+            query.order_by(
+                Prediction.created_at.desc()
+            )
             .all()
         )
 
