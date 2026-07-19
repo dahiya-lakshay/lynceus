@@ -39,3 +39,15 @@ def get_dashboard(
     return AdminService.get_dashboard_stats(
         db,
     )
+
+
+@router.get(
+    "/high-risk-transactions",
+)
+def get_high_risk_transactions(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    return AdminService.get_high_risk_transactions(
+        db,
+    )

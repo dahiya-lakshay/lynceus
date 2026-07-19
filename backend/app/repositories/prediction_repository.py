@@ -1,6 +1,9 @@
 from sqlalchemy.orm import Session
 
-from app.models.prediction import Prediction
+from app.models.prediction import (
+    Prediction,
+    PredictionLabel,
+)
 
 
 class PredictionRepository:
@@ -51,4 +54,20 @@ class PredictionRepository:
                 Prediction.transaction_id == transaction_id
             )
             .first()
+        )
+
+    @staticmethod
+    def get_high_risk_transactions(
+        db: Session,
+    ) -> list[Prediction]:
+
+        return (
+            db.query(Prediction)
+            .filter(
+                Prediction.prediction_label == PredictionLabel.FRAUD
+            )
+            .order_by(
+                Prediction.risk_score.desc()
+            )
+            .all()
         )

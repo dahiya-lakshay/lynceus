@@ -6,6 +6,7 @@ from app.models.prediction import (
 )
 from app.models.transaction import Transaction
 from app.models.user import User
+from app.repositories.prediction_repository import PredictionRepository
 from app.repositories.user_repository import UserRepository
 
 
@@ -51,3 +52,9 @@ class AdminService:
             "total_predictions": total_predictions,
             "high_risk_transactions": high_risk_transactions,
         }
+
+    @staticmethod
+    def get_high_risk_transactions(
+        db: Session,
+    ):
+        return PredictionRepository.get_high_risk_transactions(db)
