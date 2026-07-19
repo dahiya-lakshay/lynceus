@@ -1,6 +1,12 @@
+from decimal import Decimal
+
 from sqlalchemy.orm import Session
 
-from app.models.transaction import Transaction
+from app.models.transaction import (
+    PaymentMethod,
+    Transaction,
+    TransactionStatus,
+)
 
 
 class TransactionRepository:
@@ -22,12 +28,52 @@ class TransactionRepository:
         db: Session,
         page: int = 1,
         size: int = 20,
+        status: TransactionStatus | None = None,
+        payment_method: PaymentMethod | None = None,
+        sender_id: int | None = None,
+        receiver_id: int | None = None,
+        min_amount: Decimal | None = None,
+        max_amount: Decimal | None = None,
     ) -> list[Transaction]:
+
+        query = db.query(Transaction)
+
+        if status is not None:
+            query = query.filter(
+                Transaction.status == status
+            )
+
+        if payment_method is not None:
+            query = query.filter(
+                Transaction.payment_method == payment_method
+            )
+
+        if sender_id is not None:
+            query = query.filter(
+                Transaction.sender_id == sender_id
+            )
+
+        if receiver_id is not None:
+            query = query.filter(
+                Transaction.receiver_id == receiver_id
+            )
+
+        if min_amount is not None:
+            query = query.filter(
+                Transaction.amount >= min_amount
+            )
+
+        if max_amount is not None:
+            query = query.filter(
+                Transaction.amount <= max_amount
+            )
 
         offset = (page - 1) * size
 
         return (
-            db.query(Transaction)
+            query.order_by(
+                Transaction.created_at.desc()
+            )
             .offset(offset)
             .limit(size)
             .all()
@@ -36,12 +82,47 @@ class TransactionRepository:
     @staticmethod
     def count(
         db: Session,
+        status: TransactionStatus | None = None,
+        payment_method: PaymentMethod | None = None,
+        sender_id: int | None = None,
+        receiver_id: int | None = None,
+        min_amount: Decimal | None = None,
+        max_amount: Decimal | None = None,
     ) -> int:
 
-        return (
-            db.query(Transaction)
-            .count()
-        )
+        query = db.query(Transaction)
+
+        if status is not None:
+            query = query.filter(
+                Transaction.status == status
+            )
+
+        if payment_method is not None:
+            query = query.filter(
+                Transaction.payment_method == payment_method
+            )
+
+        if sender_id is not None:
+            query = query.filter(
+                Transaction.sender_id == sender_id
+            )
+
+        if receiver_id is not None:
+            query = query.filter(
+                Transaction.receiver_id == receiver_id
+            )
+
+        if min_amount is not None:
+            query = query.filter(
+                Transaction.amount >= min_amount
+            )
+
+        if max_amount is not None:
+            query = query.filter(
+                Transaction.amount <= max_amount
+            )
+
+        return query.count()
 
     @staticmethod
     def get_by_id(

@@ -1,10 +1,14 @@
 from fastapi import HTTPException, status
 from sqlalchemy.orm import Session
 
+from decimal import Decimal
+
 from app.models.transaction import (
     PaymentMethod,
     Transaction,
+    TransactionStatus,
 )
+
 from app.models.user import User
 from app.repositories.transaction_repository import (
     TransactionRepository,
@@ -92,16 +96,34 @@ class TransactionService:
         db: Session,
         page: int,
         size: int,
+        status: TransactionStatus | None = None,
+        payment_method: PaymentMethod | None = None,
+        sender_id: int | None = None,
+        receiver_id: int | None = None,
+        min_amount: Decimal | None = None,
+        max_amount: Decimal | None = None,
     ):
 
         transactions = TransactionRepository.get_all(
             db,
             page,
             size,
+            status,
+            payment_method,
+            sender_id,
+            receiver_id,
+            min_amount,
+            max_amount,
         )
 
         total = TransactionRepository.count(
             db,
+            status,
+            payment_method,
+            sender_id,
+            receiver_id,
+            min_amount,
+            max_amount,
         )
 
         return {
