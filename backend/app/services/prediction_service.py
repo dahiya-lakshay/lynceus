@@ -15,6 +15,7 @@ from app.models.transaction import (
 from app.repositories.prediction_repository import (
     PredictionRepository,
 )
+from app.services.case_service import CaseService
 
 
 class PredictionService:
@@ -58,10 +59,18 @@ class PredictionService:
         transaction.prediction = result["prediction"]
 
         if result["prediction"] == "FRAUD":
+
             transaction.status = (
                 TransactionStatus.FLAGGED
             )
+
+            CaseService.create_case_for_transaction(
+                db,
+                transaction.id,
+            )
+
         else:
+
             transaction.status = (
                 TransactionStatus.APPROVED
             )

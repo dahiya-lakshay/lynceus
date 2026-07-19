@@ -11,6 +11,11 @@ from app.schemas.case import (
     UpdateCase,
 )
 
+from app.models.case import (
+    Case,
+    CasePriority,
+)
+
 
 class CaseService:
 
@@ -178,6 +183,32 @@ class CaseService:
             )
 
         CaseRepository.delete(
+            db,
+            case,
+        )
+
+    @staticmethod
+    def create_case_for_transaction(
+        db: Session,
+        transaction_id: int,
+    ) -> Case:
+
+        existing_case = (
+            CaseRepository.get_by_transaction_id(
+                db,
+                transaction_id,
+            )
+        )
+
+        if existing_case is not None:
+            return existing_case
+
+        case = Case(
+            transaction_id=transaction_id,
+            priority=CasePriority.HIGH,
+        )
+
+        return CaseRepository.create(
             db,
             case,
         )
