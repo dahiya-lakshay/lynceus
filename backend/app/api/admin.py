@@ -7,6 +7,10 @@ from sqlalchemy.orm import Session
 from app.auth.dependencies import require_admin
 from app.database.database import get_db
 from app.models.user import User
+from app.schemas.admin import (
+    AnalyticsResponse,
+    DashboardStatsResponse,
+)
 from app.schemas.auth import UserResponse
 from app.services.admin_service import AdminService
 
@@ -31,6 +35,7 @@ def get_all_users(
 
 @router.get(
     "/dashboard",
+    response_model=DashboardStatsResponse,
 )
 def get_dashboard(
     db: Session = Depends(get_db),
@@ -49,5 +54,18 @@ def get_high_risk_transactions(
     current_user: User = Depends(require_admin),
 ):
     return AdminService.get_high_risk_transactions(
+        db,
+    )
+
+
+@router.get(
+    "/analytics",
+    response_model=AnalyticsResponse,
+)
+def get_analytics(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(require_admin),
+):
+    return AdminService.get_analytics(
         db,
     )
