@@ -1,5 +1,5 @@
 from decimal import Decimal
-
+from sqlalchemy import func
 from sqlalchemy.orm import Query, Session
 
 from app.models.transaction import (
@@ -174,3 +174,55 @@ class TransactionRepository:
 
         db.delete(transaction)
         db.commit()
+
+    @staticmethod
+    def count_by_sender(
+        db: Session,
+        sender_id: int,
+    ) -> int:
+
+        return (
+            db.query(func.count(Transaction.id))
+            .filter(Transaction.sender_id == sender_id)
+            .scalar()
+            or 0
+        )
+
+    @staticmethod
+    def count_by_receiver(
+        db: Session,
+        receiver_id: int,
+    ) -> int:
+
+        return (
+            db.query(func.count(Transaction.id))
+            .filter(Transaction.receiver_id == receiver_id)
+            .scalar()
+            or 0
+        )
+
+    @staticmethod
+    def total_sent_by_sender(
+        db: Session,
+        sender_id: int,
+    ) -> Decimal:
+
+        return (
+            db.query(func.sum(Transaction.amount))
+            .filter(Transaction.sender_id == sender_id)
+            .scalar()
+            or Decimal("0")
+        )
+
+    @staticmethod
+    def total_received_by_receiver(
+        db: Session,
+        receiver_id: int,
+    ) -> Decimal:
+
+        return (
+            db.query(func.sum(Transaction.amount))
+            .filter(Transaction.receiver_id == receiver_id)
+            .scalar()
+            or Decimal("0")
+        )
