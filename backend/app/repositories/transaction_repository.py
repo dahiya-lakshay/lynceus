@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Query, Session
 
 from app.models.transaction import (
     PaymentMethod,
@@ -12,31 +12,15 @@ from app.models.transaction import (
 class TransactionRepository:
 
     @staticmethod
-    def create(
+    def _build_filtered_query(
         db: Session,
-        transaction: Transaction,
-    ) -> Transaction:
-
-        db.add(transaction)
-        db.commit()
-        db.refresh(transaction)
-
-        return transaction
-
-    @staticmethod
-    def get_all(
-        db: Session,
-        page: int = 1,
-        size: int = 20,
         status: TransactionStatus | None = None,
         payment_method: PaymentMethod | None = None,
         sender_id: int | None = None,
         receiver_id: int | None = None,
         min_amount: Decimal | None = None,
         max_amount: Decimal | None = None,
-        sort_by: str = "created_at",
-        sort_order: str = "desc",
-    ) -> list[Transaction]:
+    ) -> Query:
 
         query = db.query(Transaction)
 
@@ -69,6 +53,45 @@ class TransactionRepository:
             query = query.filter(
                 Transaction.amount <= max_amount
             )
+
+        return query
+
+    @staticmethod
+    def create(
+        db: Session,
+        transaction: Transaction,
+    ) -> Transaction:
+
+        db.add(transaction)
+        db.commit()
+        db.refresh(transaction)
+
+        return transaction
+
+    @staticmethod
+    def get_all(
+        db: Session,
+        page: int = 1,
+        size: int = 20,
+        status: TransactionStatus | None = None,
+        payment_method: PaymentMethod | None = None,
+        sender_id: int | None = None,
+        receiver_id: int | None = None,
+        min_amount: Decimal | None = None,
+        max_amount: Decimal | None = None,
+        sort_by: str = "created_at",
+        sort_order: str = "desc",
+    ) -> list[Transaction]:
+
+        query = TransactionRepository._build_filtered_query(
+            db,
+            status,
+            payment_method,
+            sender_id,
+            receiver_id,
+            min_amount,
+            max_amount,
+        )
 
         allowed_sort_fields = {
             "id": Transaction.id,
@@ -108,37 +131,15 @@ class TransactionRepository:
         max_amount: Decimal | None = None,
     ) -> int:
 
-        query = db.query(Transaction)
-
-        if status is not None:
-            query = query.filter(
-                Transaction.status == status
-            )
-
-        if payment_method is not None:
-            query = query.filter(
-                Transaction.payment_method == payment_method
-            )
-
-        if sender_id is not None:
-            query = query.filter(
-                Transaction.sender_id == sender_id
-            )
-
-        if receiver_id is not None:
-            query = query.filter(
-                Transaction.receiver_id == receiver_id
-            )
-
-        if min_amount is not None:
-            query = query.filter(
-                Transaction.amount >= min_amount
-            )
-
-        if max_amount is not None:
-            query = query.filter(
-                Transaction.amount <= max_amount
-            )
+        query = TransactionRepository._build_filtered_query(
+            db,
+            status,
+            payment_method,
+            sender_id,
+            receiver_id,
+            min_amount,
+            max_amount,
+        )
 
         return query.count()
 
