@@ -90,11 +90,26 @@ class TransactionService:
     @staticmethod
     def get_all_transactions(
         db: Session,
+        page: int,
+        size: int,
     ):
 
-        return TransactionRepository.get_all(
+        transactions = TransactionRepository.get_all(
+            db,
+            page,
+            size,
+        )
+
+        total = TransactionRepository.count(
             db,
         )
+
+        return {
+            "page": page,
+            "size": size,
+            "total": total,
+            "items": transactions,
+        }
 
     @staticmethod
     def get_transaction(

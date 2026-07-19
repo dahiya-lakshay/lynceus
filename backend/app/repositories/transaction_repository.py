@@ -20,11 +20,27 @@ class TransactionRepository:
     @staticmethod
     def get_all(
         db: Session,
+        page: int = 1,
+        size: int = 20,
     ) -> list[Transaction]:
+
+        offset = (page - 1) * size
 
         return (
             db.query(Transaction)
+            .offset(offset)
+            .limit(size)
             .all()
+        )
+
+    @staticmethod
+    def count(
+        db: Session,
+    ) -> int:
+
+        return (
+            db.query(Transaction)
+            .count()
         )
 
     @staticmethod

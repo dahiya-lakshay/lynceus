@@ -2,6 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 from uuid import UUID
+from app.models.transaction import TransactionStatus
 
 from pydantic import BaseModel, ConfigDict
 
@@ -34,7 +35,7 @@ class TransactionResponse(BaseModel):
     amount: Decimal
     currency: str
     payment_method: PaymentMethod
-    status: str
+    status: TransactionStatus
     risk_score: Decimal | None
     prediction: str | None
     created_at: datetime

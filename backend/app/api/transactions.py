@@ -2,6 +2,7 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
+    Query,
     Response,
     status,
 )
@@ -10,6 +11,7 @@ from sqlalchemy.orm import Session
 from app.auth.dependencies import get_current_user
 from app.database.database import get_db
 from app.models.user import User
+from app.schemas.common import PaginatedResponse
 from app.schemas.transaction import (
     CreateTransaction,
     TransactionResponse,
@@ -45,14 +47,25 @@ def create_transaction(
 
 @router.get(
     "",
-    response_model=list[TransactionResponse],
+    response_model=PaginatedResponse[TransactionResponse],
 )
 def get_transactions(
+    page: int = Query(1, ge=1),
+    size: int = Query(20, ge=1, le=100),
     db: Session = Depends(get_db),
 ):
 
-    return TransactionService.get_all_transactions(
+    result = TransactionService.get_all_transactions(
         db,
+        page,
+        size,
+    )
+
+    return PaginatedResponse[TransactionResponse].create(
+        page=result["page"],
+        size=result["size"],
+        total=result["total"],
+        items=result["items"],
     )
 
 
