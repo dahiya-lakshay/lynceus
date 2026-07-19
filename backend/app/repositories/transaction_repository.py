@@ -34,6 +34,8 @@ class TransactionRepository:
         receiver_id: int | None = None,
         min_amount: Decimal | None = None,
         max_amount: Decimal | None = None,
+        sort_by: str = "created_at",
+        sort_order: str = "desc",
     ) -> list[Transaction]:
 
         query = db.query(Transaction)
@@ -68,12 +70,28 @@ class TransactionRepository:
                 Transaction.amount <= max_amount
             )
 
+        allowed_sort_fields = {
+            "id": Transaction.id,
+            "amount": Transaction.amount,
+            "created_at": Transaction.created_at,
+            "status": Transaction.status,
+            "payment_method": Transaction.payment_method,
+        }
+
+        sort_column = allowed_sort_fields.get(
+            sort_by,
+            Transaction.created_at,
+        )
+
+        if sort_order.lower() == "asc":
+            query = query.order_by(sort_column.asc())
+        else:
+            query = query.order_by(sort_column.desc())
+
         offset = (page - 1) * size
 
         return (
-            query.order_by(
-                Transaction.created_at.desc()
-            )
+            query
             .offset(offset)
             .limit(size)
             .all()

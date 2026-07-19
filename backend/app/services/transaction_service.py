@@ -102,6 +102,8 @@ class TransactionService:
         receiver_id: int | None = None,
         min_amount: Decimal | None = None,
         max_amount: Decimal | None = None,
+        sort_by: str = "created_at",
+        sort_order: str = "desc",
     ):
 
         transactions = TransactionRepository.get_all(
@@ -114,6 +116,8 @@ class TransactionService:
             receiver_id,
             min_amount,
             max_amount,
+            sort_by,
+            sort_order,
         )
 
         total = TransactionRepository.count(
