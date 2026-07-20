@@ -16,6 +16,9 @@ from app.repositories.prediction_repository import (
     PredictionRepository,
 )
 from app.services.case_service import CaseService
+from app.services.feature_engineering_service import (
+    FeatureEngineeringService,
+)
 
 
 class PredictionService:
@@ -26,25 +29,37 @@ class PredictionService:
         transaction: Transaction,
     ) -> Prediction:
 
+        features = FeatureEngineeringService.build_features(
+            db,
+            transaction,
+        )
+
         result = FraudInference.predict(
-            amount=float(transaction.amount),
+            features,
         )
 
         prediction = Prediction(
+
             transaction_id=transaction.id,
-            model_name="Lynceus Baseline",
-            model_version="1.0.0",
+
+            model_name=result["model_name"],
+
+            model_version=result["model_version"],
+
             fraud_probability=Decimal(
                 str(result["fraud_probability"])
             ),
+
             risk_score=Decimal(
                 str(result["risk_score"])
             ),
+
             prediction_label=PredictionLabel(
                 result["prediction"]
             ),
-            explanation=result["explanation"],
+
             latency_ms=result["latency_ms"],
+
         )
 
         saved_prediction = PredictionRepository.create(
@@ -76,6 +91,7 @@ class PredictionService:
             )
 
         db.commit()
+
         db.refresh(transaction)
 
         return saved_prediction

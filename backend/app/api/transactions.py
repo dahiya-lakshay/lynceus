@@ -3,7 +3,6 @@ from decimal import Decimal
 from fastapi import (
     APIRouter,
     Depends,
-    HTTPException,
     Query,
     Response,
     status,
@@ -48,58 +47,6 @@ def create_transaction(
         db,
         current_user,
         transaction,
-    )
-
-
-@router.get(
-    "",
-    response_model=PaginatedResponse[TransactionResponse],
-)
-def get_transactions(
-    page: int = Query(1, ge=1),
-    size: int = Query(20, ge=1, le=100),
-    status: TransactionStatus | None = Query(
-        default=None,
-    ),
-    payment_method: PaymentMethod | None = Query(
-        default=None,
-    ),
-    sender_id: int | None = Query(
-        default=None,
-        ge=1,
-    ),
-    receiver_id: int | None = Query(
-        default=None,
-        ge=1,
-    ),
-    min_amount: Decimal | None = Query(
-        default=None,
-        ge=0,
-    ),
-    max_amount: Decimal | None = Query(
-        default=None,
-        ge=0,
-    ),
-    db: Session = Depends(get_db),
-):
-
-    result = TransactionService.get_all_transactions(
-        db,
-        page,
-        size,
-        status,
-        payment_method,
-        sender_id,
-        receiver_id,
-        min_amount,
-        max_amount,
-    )
-
-    return PaginatedResponse[TransactionResponse].create(
-        page=result["page"],
-        size=result["size"],
-        total=result["total"],
-        items=result["items"],
     )
 
 

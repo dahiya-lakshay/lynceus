@@ -1,4 +1,6 @@
+from datetime import datetime, timedelta
 from decimal import Decimal
+
 from sqlalchemy import func
 from sqlalchemy.orm import Query, Session
 
@@ -175,6 +177,10 @@ class TransactionRepository:
         db.delete(transaction)
         db.commit()
 
+    # ==========================================================
+    # Existing Aggregate Methods
+    # ==========================================================
+
     @staticmethod
     def count_by_sender(
         db: Session,
@@ -225,4 +231,114 @@ class TransactionRepository:
             .filter(Transaction.receiver_id == receiver_id)
             .scalar()
             or Decimal("0")
+        )
+
+    # ==========================================================
+    # Feature Engineering Queries
+    # ==========================================================
+
+    @staticmethod
+    def count_sender_transactions_last_24h(
+        db: Session,
+        sender_id: int,
+    ) -> int:
+
+        since = datetime.utcnow() - timedelta(hours=24)
+
+        return (
+            db.query(func.count(Transaction.id))
+            .filter(
+                Transaction.sender_id == sender_id,
+                Transaction.created_at >= since,
+            )
+            .scalar()
+            or 0
+        )
+
+    @staticmethod
+    def count_receiver_transactions_last_24h(
+        db: Session,
+        receiver_id: int,
+    ) -> int:
+
+        since = datetime.utcnow() - timedelta(hours=24)
+
+        return (
+            db.query(func.count(Transaction.id))
+            .filter(
+                Transaction.receiver_id == receiver_id,
+                Transaction.created_at >= since,
+            )
+            .scalar()
+            or 0
+        )
+
+    @staticmethod
+    def average_sender_amount_last_30d(
+        db: Session,
+        sender_id: int,
+    ) -> Decimal:
+
+        since = datetime.utcnow() - timedelta(days=30)
+
+        return (
+            db.query(func.avg(Transaction.amount))
+            .filter(
+                Transaction.sender_id == sender_id,
+                Transaction.created_at >= since,
+            )
+            .scalar()
+            or Decimal("0")
+        )
+
+    @staticmethod
+    def average_receiver_amount_last_30d(
+        db: Session,
+        receiver_id: int,
+    ) -> Decimal:
+
+        since = datetime.utcnow() - timedelta(days=30)
+
+        return (
+            db.query(func.avg(Transaction.amount))
+            .filter(
+                Transaction.receiver_id == receiver_id,
+                Transaction.created_at >= since,
+            )
+            .scalar()
+            or Decimal("0")
+        )
+
+    @staticmethod
+    def has_previous_transaction(
+        db: Session,
+        sender_id: int,
+        receiver_id: int,
+    ) -> bool:
+
+        return (
+            db.query(Transaction)
+            .filter(
+                Transaction.sender_id == sender_id,
+                Transaction.receiver_id == receiver_id,
+            )
+            .first()
+            is not None
+        )
+
+    @staticmethod
+    def has_seen_device(
+        db: Session,
+        sender_id: int,
+        device_id_hash: str,
+    ) -> bool:
+
+        return (
+            db.query(Transaction)
+            .filter(
+                Transaction.sender_id == sender_id,
+                Transaction.device_id_hash == device_id_hash,
+            )
+            .first()
+            is not None
         )

@@ -71,9 +71,13 @@ class TransactionService:
             sender_id=current_user.id,
             receiver_id=data.receiver_id,
             amount=data.amount,
-            payment_method=PaymentMethod(
-                data.payment_method
-            ),
+            payment_method=PaymentMethod(data.payment_method),
+
+            origin_country=data.origin_country,
+            destination_country=data.destination_country,
+            merchant_category=data.merchant_category,
+            device_type=data.device_type,
+            device_id_hash=data.device_id_hash,
         )
 
         transaction = TransactionRepository.create(
@@ -182,6 +186,21 @@ class TransactionService:
             transaction.payment_method = PaymentMethod(
                 data.payment_method
             )
+
+        if data.origin_country is not None:
+            transaction.origin_country = data.origin_country
+
+        if data.destination_country is not None:
+            transaction.destination_country = data.destination_country
+
+        if data.merchant_category is not None:
+            transaction.merchant_category = data.merchant_category
+
+        if data.device_type is not None:
+            transaction.device_type = data.device_type
+
+        if data.device_id_hash is not None:
+            transaction.device_id_hash = data.device_id_hash
 
         return TransactionRepository.update(
             db,

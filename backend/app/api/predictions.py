@@ -11,6 +11,12 @@ from app.schemas.common import PaginatedResponse
 from app.schemas.prediction import PredictionResponse
 from app.services.prediction_service import PredictionService
 
+from app.ml.inference import FraudInference
+from app.schemas.fraud import (
+    FraudPredictionRequest,
+    FraudPredictionResponse,
+)
+
 router = APIRouter(
     prefix="/predictions",
     tags=["Predictions"],
@@ -98,4 +104,20 @@ def get_prediction_by_transaction(
     return PredictionService.get_prediction_by_transaction(
         db,
         transaction_id,
+    )
+
+@router.post(
+    "/predict",
+    response_model=FraudPredictionResponse,
+)
+def predict_fraud(
+    request: FraudPredictionRequest,
+):
+
+    result = FraudInference.predict(
+        request.model_dump()
+    )
+
+    return FraudPredictionResponse(
+        **result
     )

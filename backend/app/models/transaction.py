@@ -41,6 +41,28 @@ class PaymentMethod(str, Enum):
     WALLET = "WALLET"
 
 
+class MerchantCategory(str, Enum):
+    SHOPPING = "SHOPPING"
+    TRAVEL = "TRAVEL"
+    FOOD = "FOOD"
+    HEALTHCARE = "HEALTHCARE"
+    UTILITIES = "UTILITIES"
+    ENTERTAINMENT = "ENTERTAINMENT"
+    EDUCATION = "EDUCATION"
+    FUEL = "FUEL"
+    OTHER = "OTHER"
+
+
+class DeviceType(str, Enum):
+    ANDROID = "ANDROID"
+    IOS = "IOS"
+    WINDOWS = "WINDOWS"
+    MACOS = "MACOS"
+    LINUX = "LINUX"
+    WEB = "WEB"
+    OTHER = "OTHER"
+
+
 class Transaction(Base):
     __tablename__ = "transactions"
 
@@ -85,6 +107,42 @@ class Transaction(Base):
         SQLEnum(PaymentMethod),
         nullable=False,
     )
+
+    # ==========================
+    # ML Feature Fields
+    # ==========================
+
+    origin_country: Mapped[str] = mapped_column(
+        String(2),
+        default="IN",
+        nullable=False,
+    )
+
+    destination_country: Mapped[str] = mapped_column(
+        String(2),
+        default="IN",
+        nullable=False,
+    )
+
+    merchant_category: Mapped[MerchantCategory] = mapped_column(
+        SQLEnum(MerchantCategory),
+        default=MerchantCategory.OTHER,
+        nullable=False,
+    )
+
+    device_type: Mapped[DeviceType] = mapped_column(
+        SQLEnum(DeviceType),
+        default=DeviceType.OTHER,
+        nullable=False,
+    )
+
+    device_id_hash: Mapped[str] = mapped_column(
+        String(128),
+        default="UNKNOWN",
+        nullable=False,
+    )
+
+    # ==========================
 
     status: Mapped[TransactionStatus] = mapped_column(
         SQLEnum(TransactionStatus),
