@@ -1,0 +1,163 @@
+{
+  "timestamp": {
+    "dtype": "datetime",
+    "role": "reference_only"
+  },
+  "amount": {
+    "dtype": "float",
+    "role": "feature"
+  },
+  "currency": {
+    "dtype": "category",
+    "role": "feature",
+    "values": [
+      "INR",
+      "USD",
+      "EUR",
+      "GBP"
+    ]
+  },
+  "payment_method": {
+    "dtype": "category",
+    "role": "feature",
+    "values": [
+      "UPI",
+      "CARD",
+      "BANK_TRANSFER",
+      "WALLET"
+    ]
+  },
+  "hour": {
+    "dtype": "int",
+    "role": "feature",
+    "range": [
+      0,
+      23
+    ]
+  },
+  "day_of_week": {
+    "dtype": "int",
+    "role": "feature",
+    "range": [
+      0,
+      6
+    ]
+  },
+  "is_weekend": {
+    "dtype": "binary",
+    "role": "feature"
+  },
+  "sender_account_age_days": {
+    "dtype": "int",
+    "role": "feature"
+  },
+  "receiver_account_age_days": {
+    "dtype": "int",
+    "role": "feature"
+  },
+  "sender_txn_count_24h": {
+    "dtype": "int",
+    "role": "feature"
+  },
+  "receiver_txn_count_24h": {
+    "dtype": "int",
+    "role": "feature"
+  },
+  "sender_avg_amount_30d": {
+    "dtype": "float",
+    "role": "feature"
+  },
+  "receiver_avg_amount_30d": {
+    "dtype": "float",
+    "role": "feature"
+  },
+  "is_new_receiver": {
+    "dtype": "binary",
+    "role": "feature"
+  },
+  "origin_country": {
+    "dtype": "category",
+    "role": "feature",
+    "values": [
+      "IN",
+      "US",
+      "GB",
+      "AE",
+      "SG",
+      "JP",
+      "DE",
+      "FR"
+    ]
+  },
+  "destination_country": {
+    "dtype": "category",
+    "role": "feature",
+    "values": [
+      "IN",
+      "US",
+      "GB",
+      "AE",
+      "SG",
+      "JP",
+      "DE",
+      "FR",
+      "NG",
+      "PK",
+      "RU",
+      "IR",
+      "KP"
+    ]
+  },
+  "merchant_category": {
+    "dtype": "category",
+    "role": "feature",
+    "values": [
+      "SHOPPING",
+      "TRAVEL",
+      "FOOD",
+      "HEALTHCARE",
+      "UTILITIES",
+      "ENTERTAINMENT",
+      "EDUCATION",
+      "FUEL",
+      "ELECTRONICS",
+      "OTHER"
+    ]
+  },
+  "device_type": {
+    "dtype": "category",
+    "role": "feature",
+    "values": [
+      "ANDROID",
+      "IOS",
+      "WINDOWS",
+      "MACOS",
+      "LINUX",
+      "WEB"
+    ]
+  },
+  "device_trusted": {
+    "dtype": "binary",
+    "role": "feature"
+  },
+  "cross_border": {
+    "dtype": "binary",
+    "role": "feature"
+  },
+  "high_risk_country": {
+    "dtype": "binary",
+    "role": "feature"
+  },
+  "velocity_score": {
+    "dtype": "float",
+    "role": "feature",
+    "range": [
+      0,
+      1
+    ]
+  },
+  "fraud_label": {
+    "dtype": "binary",
+    "role": "target"
+  }
+}

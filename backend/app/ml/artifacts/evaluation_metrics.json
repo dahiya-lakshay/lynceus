@@ -1,0 +1,20 @@
+{
+    "model_name": "LGBMClassifier",
+    "validation_metrics": {
+        "Accuracy": 0.9844666666666667,
+        "Precision": 0.7342342342342343,
+        "Recall": 0.4836795252225519,
+        "F1 Score": 0.5831842576028623,
+        "ROC-AUC": 0.8837575592981062,
+        "PR-AUC": 0.5836839758163083
+    },
+    "optimized_metrics": {
+        "Accuracy": 0.9845333333333334,
+        "Precision": 0.7058823529411765,
+        "Recall": 0.5341246290801187,
+        "F1 Score": 0.6081081081081081,
+        "ROC-AUC": 0.8837575592981062,
+        "PR-AUC": 0.5836839758163083
+    },
+    "optimal_threshold": 0.4000000000000001
+}

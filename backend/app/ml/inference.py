@@ -1,67 +1,92 @@
+from __future__ import annotations
+
 from time import perf_counter
+from typing import Any
+
+import pandas as pd
 
 from app.ml.model_loader import ModelLoader
+from app.ml.preprocessing import prepare_dataframe
 
 
 class FraudInference:
+    """
+    Production inference service for Lynceus.
+
+    Workflow
+    --------
+    Incoming Transaction
+            ↓
+    Prepare DataFrame
+            ↓
+    Preprocessing Pipeline
+            ↓
+    ML Model
+            ↓
+    Fraud Probability
+            ↓
+    Threshold Decision
+            ↓
+    Response
+    """
 
     @staticmethod
     def predict(
-        *,
-        amount: float,
-    ) -> dict:
+        transaction: dict[str, Any],
+    ) -> dict[str, Any]:
 
         start_time = perf_counter()
 
-        model = ModelLoader.get_model()
+        try:
 
-        # Temporary fallback until a trained model exists
-        if model is None:
+            model = ModelLoader.get_model()
 
-            fraud_probability = (
-                0.90 if amount >= 100000 else 0.08
-            )
+            preprocessor = ModelLoader.get_preprocessor()
 
-        else:
+            metadata = ModelLoader.get_metadata()
 
-            features = [
-                [
-                    amount,
-                ]
-            ]
+            threshold = metadata["optimal_threshold"]
+
+            df = pd.DataFrame([transaction])
+
+            df = prepare_dataframe(df)
+
+            X = preprocessor.transform(df)
 
             fraud_probability = float(
-                model.predict_proba(features)[0][1]
+                model.predict_proba(X)[0][1]
             )
 
-        latency_ms = int(
-            (perf_counter() - start_time) * 1000
-        )
+            prediction = (
+                "FRAUD"
+                if fraud_probability >= threshold
+                else "LEGITIMATE"
+            )
 
-        risk_score = round(
-            fraud_probability * 100,
-            2,
-        )
+            latency_ms = int(
+                (perf_counter() - start_time) * 1000
+            )
 
-        prediction = (
-            "FRAUD"
-            if fraud_probability >= 0.5
-            else "LEGITIMATE"
-        )
+            return {
+                "prediction": prediction,
 
-        explanation = (
-            "High fraud probability"
-            if prediction == "FRAUD"
-            else "Low fraud probability"
-        )
+                "fraud_probability": round(
+                    fraud_probability,
+                    4
+                ),
 
-        return {
-            "fraud_probability": round(
-                fraud_probability,
-                4,
-            ),
-            "risk_score": risk_score,
-            "prediction": prediction,
-            "explanation": explanation,
-            "latency_ms": latency_ms,
-        }
+                "risk_score": round(
+                    fraud_probability * 100,
+                    2
+                ),
+
+                "model_name": metadata["model_name"],
+                "model_version": metadata["model_version"],
+                "latency_ms": latency_ms
+            }
+
+        except Exception as exc:
+
+            raise RuntimeError(
+                f"Fraud inference failed: {exc}"
+            ) from exc

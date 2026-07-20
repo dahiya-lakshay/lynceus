@@ -1,0 +1,22 @@
+{
+    "model_name": "LGBMClassifier",
+    "model_version": "1.0.0",
+    "optimal_threshold": 0.4000000000000001,
+    "feature_count": 41,
+    "validation_metrics": {
+        "accuracy": 0.9845333333333334,
+        "precision": 0.7058823529411765,
+        "recall": 0.5341246290801187,
+        "f1_score": 0.6081081081081081,
+        "roc_auc": 0.8837575592981062,
+        "pr_auc": 0.5836839758163083
+    },
+    "test_metrics": {
+        "accuracy": 0.9834,
+        "precision": 0.7414634146341463,
+        "recall": 0.4367816091954023,
+        "f1_score": 0.5497287522603979,
+        "roc_auc": 0.8663020387158318,
+        "pr_auc": 0.5640666643027727
+    }
+}

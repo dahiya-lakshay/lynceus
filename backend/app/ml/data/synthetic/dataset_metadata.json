@@ -1,0 +1,74 @@
+{
+  "generation_time": "2026-07-20T10:40:40.229036Z",
+  "random_seed": 42,
+  "num_transactions": 100000,
+  "target_fraud_rate": 0.02,
+  "actual_fraud_rate": 0.0225,
+  "fraud_scenario_counts": {
+    "LEGITIMATE": 98008,
+    "CARD_TESTING": 510,
+    "STOLEN_CARD": 294,
+    "ACCOUNT_TAKEOVER": 616,
+    "MONEY_MULE": 388,
+    "SYNTHETIC_IDENTITY": 184
+  },
+  "fraud_scenario_distribution_weights": {
+    "ACCOUNT_TAKEOVER": 30,
+    "CARD_TESTING": 25,
+    "MONEY_MULE": 20,
+    "STOLEN_CARD": 15,
+    "SYNTHETIC_IDENTITY": 10
+  },
+  "difficulty_config": {
+    "fraud_mutation_skip_prob": 0.27,
+    "legit_lookalike_rate": 0.085,
+    "feature_jitter_std": 0.065,
+    "label_noise_rate_fraud_to_legit": 0.09,
+    "label_noise_rate_legit_to_fraud": 0.0045
+  },
+  "class_balance": {
+    "legitimate": 97746,
+    "fraud": 2254
+  },
+  "split": {
+    "train_rows": 70000,
+    "val_rows": 15000,
+    "test_rows": 15000,
+    "method": "chronological (sorted by timestamp)",
+    "fractions": {
+      "train": 0.7,
+      "val": 0.15,
+      "test": 0.15
+    }
+  },
+  "training_feature_names": [
+    "amount",
+    "currency",
+    "payment_method",
+    "hour",
+    "day_of_week",
+    "is_weekend",
+    "sender_account_age_days",
+    "receiver_account_age_days",
+    "sender_txn_count_24h",
+    "receiver_txn_count_24h",
+    "sender_avg_amount_30d",
+    "receiver_avg_amount_30d",
+    "is_new_receiver",
+    "origin_country",
+    "destination_country",
+    "merchant_category",
+    "device_type",
+    "device_trusted",
+    "cross_border",
+    "high_risk_country",
+    "velocity_score"
+  ],
+  "files": {
+    "full_dataset": "/Users/lakshaydahiya/Desktop/engineerOS/01_projects/lynceus/backend/app/ml/data/transactions_full.csv",
+    "training_dataset": "/Users/lakshaydahiya/Desktop/engineerOS/01_projects/lynceus/backend/app/ml/data/transactions.csv",
+    "train": "/Users/lakshaydahiya/Desktop/engineerOS/01_projects/lynceus/backend/app/ml/data/transactions_train.csv",
+    "val": "/Users/lakshaydahiya/Desktop/engineerOS/01_projects/lynceus/backend/app/ml/data/transactions_val.csv",
+    "test": "/Users/lakshaydahiya/Desktop/engineerOS/01_projects/lynceus/backend/app/ml/data/transactions_test.csv"
+  }
+}
