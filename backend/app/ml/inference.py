@@ -5,6 +5,7 @@ from typing import Any
 
 import pandas as pd
 
+from app.ml.explainability import ExplainabilityService
 from app.ml.model_loader import ModelLoader
 from app.ml.preprocessing import prepare_dataframe
 
@@ -22,6 +23,8 @@ class FraudInference:
     Preprocessing Pipeline
             ↓
     ML Model
+            ↓
+    SHAP Explainability
             ↓
     Fraud Probability
             ↓
@@ -45,6 +48,8 @@ class FraudInference:
 
             metadata = ModelLoader.get_metadata()
 
+            feature_names = ModelLoader.get_feature_names()
+
             threshold = metadata["optimal_threshold"]
 
             df = pd.DataFrame([transaction])
@@ -63,6 +68,18 @@ class FraudInference:
                 else "LEGITIMATE"
             )
 
+            explainer = ExplainabilityService.get_explainer(
+                model
+            )
+
+            explanation = (
+                ExplainabilityService.explain_prediction(
+                    explainer=explainer,
+                    X=X,
+                    feature_names=feature_names,
+                )
+            )
+
             latency_ms = int(
                 (perf_counter() - start_time) * 1000
             )
@@ -72,17 +89,27 @@ class FraudInference:
 
                 "fraud_probability": round(
                     fraud_probability,
-                    4
+                    4,
                 ),
 
                 "risk_score": round(
                     fraud_probability * 100,
-                    2
+                    2,
                 ),
 
                 "model_name": metadata["model_name"],
+
                 "model_version": metadata["model_version"],
-                "latency_ms": latency_ms
+
+                "latency_ms": latency_ms,
+
+                "top_features": explanation[
+                    "top_features"
+                ],
+
+                "explanation": explanation[
+                    "explanation"
+                ],
             }
 
         except Exception as exc:

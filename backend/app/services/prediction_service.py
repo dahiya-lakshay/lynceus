@@ -58,8 +58,11 @@ class PredictionService:
                 result["prediction"]
             ),
 
-            latency_ms=result["latency_ms"],
+            explanation=result["explanation"],
 
+            top_features=result["top_features"],
+
+            latency_ms=result["latency_ms"],
         )
 
         saved_prediction = PredictionRepository.create(
@@ -93,6 +96,8 @@ class PredictionService:
         db.commit()
 
         db.refresh(transaction)
+
+        db.refresh(saved_prediction)
 
         return saved_prediction
 

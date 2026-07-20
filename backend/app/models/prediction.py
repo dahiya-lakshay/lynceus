@@ -5,6 +5,8 @@ from decimal import Decimal
 from enum import Enum
 from typing import TYPE_CHECKING
 
+from sqlalchemy import JSON
+
 from sqlalchemy import (
     UUID,
     DateTime,
@@ -82,6 +84,11 @@ class Prediction(Base):
 
     explanation: Mapped[str | None] = mapped_column(
         Text,
+        nullable=True,
+    )
+
+    top_features: Mapped[list | None] = mapped_column(
+        JSON,
         nullable=True,
     )
 
